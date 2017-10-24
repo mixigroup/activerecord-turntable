@@ -7,9 +7,11 @@ module ActiveRecord::Turntable
   class Sequencer
     autoload :Api, "active_record/turntable/sequencer/api"
     autoload :Mysql, "active_record/turntable/sequencer/mysql"
+    autoload :Redis, "active_record/turntable/sequencer/redis"
     @@sequence_types = {
       :api => Api,
-      :mysql => Mysql
+      :mysql => Mysql,
+      :redis => Redis
     }
 
     @@sequences = {}
@@ -17,10 +19,15 @@ module ActiveRecord::Turntable
     cattr_reader :sequences, :tables
 
     def self.build(klass)
-      seq_config_name = ActiveRecord::Base.turntable_config["clusters"][klass.turntable_cluster_name.to_s]["seq"]["connection"]
-      seq_config = ActiveRecord::Base.configurations[ActiveRecord::Turntable::RackupFramework.env]["seq"][seq_config_name]
+      seq_config = ActiveRecord::Base.turntable_config["clusters"][klass.turntable_cluster_name.to_s]["seq"]
       seq_type = (seq_config["seq_type"] ? seq_config["seq_type"].to_sym : :mysql)
-      @@tables[klass.table_name] ||= (@@sequences[sequence_name(klass.table_name, klass.primary_key)] ||= @@sequence_types[seq_type].new(klass, seq_config))
+      seq_config_name = seq_config["connection"]
+      if seq_type == :mysql
+        seq_connection_config = ActiveRecord::Base.configurations[ActiveRecord::Turntable::RackupFramework.env]["seq"][seq_config_name]
+      else
+        seq_connection_config = ActiveRecord::Base.turntable_config[seq_type][seq_config_name]
+      end
+      @@tables[klass.table_name] ||= (@@sequences[sequence_name(klass.table_name, klass.primary_key)] ||= @@sequence_types[seq_type].new(klass, seq_connection_config))
     end
 
     def self.has_sequencer?(table_name)
@@ -28,7 +35,7 @@ module ActiveRecord::Turntable
     end
 
     def self.sequence_name(table_name, pk)
-      "#{ table_name}_#{pk || 'id'}_seq"
+      "#{table_name}_#{pk || 'id'}_seq"
     end
 
     def self.table_name(seq_name)
