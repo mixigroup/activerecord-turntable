@@ -14,7 +14,9 @@ module ActiveRecord::Turntable
       end
 
       def next_sequence_value(sequence_name, offset = 1)
-        client.incrby(sequence_name, offset)
+        id = client.evalsha(lua_script_sha, argv: [sequence_name, offset] )
+        raise SequenceNotFoundError if id.nil?
+        return id
       end
 
       def current_sequence_value(sequence_name)
@@ -28,6 +30,11 @@ module ActiveRecord::Turntable
       def client
         @@clients[@option] ||= ::Redis.new(@option)
       end
+
+      def lua_script_sha
+        @lua ||= client.script(:load, "return redis.call('EXISTS', ARGV[1]) == 1 and redis.call('INCRBY', ARGV[1], ARGV[2]) or nil")
+      end
     end
   end
 end
+
