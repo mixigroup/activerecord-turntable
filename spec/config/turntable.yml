@@ -15,3 +15,15 @@ test:
           less_than: 80000
         - connection: user_shard_3
           less_than: 10000000
+    friend_cluster:
+      algorithm: modulo
+      seq:
+        seq_type: redis
+        connection: redis_sequencer
+      shards:
+        - connection: redis_shard_1
+        - connection: redis_shard_2
+  redis:
+    redis_sequencer:
+      host: localhost
+

@@ -43,3 +43,20 @@ test:
       port: 3306
       encoding: utf8
       database: turntable3_test
+    redis_shard_1:
+      adapter: mysql2
+      username: root
+      password:
+      host: localhost
+      port: 3306
+      encoding: utf8
+      database:
+      database: redis_shard1_test
+    redis_shard_2:
+      adapter: mysql2
+      username: root
+      password:
+      host: localhost
+      port: 3306
+      encoding: utf8
+      database: redis_shard2_test
