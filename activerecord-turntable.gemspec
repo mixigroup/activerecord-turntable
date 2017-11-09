@@ -41,6 +41,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency(%q<pry>, [">= 0"])
   s.add_development_dependency(%q<guard-rspec>, [">= 0"])
   s.add_development_dependency(%q<coveralls>, [">= 0"])
+  s.add_development_dependency(%q<redis>, [">= 3.1.0"])
 
   if RUBY_PLATFORM =~ /darwin/
     s.add_development_dependency(%q<growl>, [">= 0"])
