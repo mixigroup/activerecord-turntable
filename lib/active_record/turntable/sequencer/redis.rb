@@ -22,7 +22,7 @@ module ActiveRecord::Turntable
       def current_sequence_value(sequence_name)
         id = client.get(sequence_name)
         raise SequenceNotFoundError if id.nil?
-        return id
+        return Integer(id) rescue raise SequenceValueBrokenError
       end
 
       private
