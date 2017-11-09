@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'pry'
 
 describe ActiveRecord::Turntable::Sequencer do
   before(:all) do
