@@ -246,8 +246,8 @@ Then, add configuration to turntable.yml:
           seq_type: redis
           connection: redis_sequencer # <-- redis sequencer name
         shards:
-          - connection: redis_shard_1
-          - connection: redis_shard_2
+          - connection: user_shard_1
+          - connection: user_shard_2
 
     redis: # <-- redis sequencer definition
       redis_sequencer: # <-- redis sequencer name
