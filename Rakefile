@@ -89,6 +89,14 @@ namespace :turntable do
           t.datetime   :deleted_at, :default => nil
         end
         ActiveRecord::Base.connection.create_sequence_for :archived_cards_users
+
+        ActiveRecord::Base.connection.create_table :friends do |t|
+          t.string :nickname
+          t.string :thumbnail_url
+          t.datetime :joined_at
+          t.datetime :deleted_at
+          t.timestamps
+        end
       end
     end
 

@@ -16,8 +16,11 @@ module ActiveRecord::Turntable
       @master_shard = MasterShard.new(klass)
 
       # setup sequencer
-      if (seq = (@options[:seq] || @config[:seq]))
-        @seq_shard = SeqShard.new(seq)
+      seq = (@options[:seq] || @config[:seq])
+      if seq
+        if seq.values.size > 0 && seq.values.first["seq_type"] == "mysql"
+          @seq_shard = SeqShard.new(seq.values.first)
+        end
       end
 
       # setup shards

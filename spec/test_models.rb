@@ -25,3 +25,9 @@ class CardsUser < ActiveRecord::Base
   belongs_to :user
   belongs_to :card
 end
+
+class Friend < ActiveRecord::Base
+  turntable :friend_cluster, :id
+  sequencer
+end
+

@@ -183,23 +183,75 @@ add turntable [shard_key_name] to the model class:
        (0.2ms) [Shard: user_shard_3] SELECT COUNT(*) FROM `users`
     => 1
 
-=== Sequencer
+== Sequencer
+
 Sequencer provides generating global IDs.
+
+Turntable has follow 2 sequencers currently:
+
+* :mysql - Use database table to generate ids.
+* :redis - Use redis to generate ids.
+
+=== Mysql example
+
+First, add configuration to turntable.yml and database.yml
+
+* database.yml
+
+  development:
+    ...
+    seq: # <-- sequence database definition
+      user_seq_1:
+        <<: *spec
+        database: sample_app_user_seq_development
+
+* turntable.yml
+
+  development:
+    clusters:
+      user_cluster: # <-- cluster name
+        ....
+        seq:
+          user_seq: # <-- sequencer name
+            seq_type: mysql # <-- sequencer type
+            connection: user_seq_1 # <-- sequencer database connection
 
 Add below to the migration:
 
-      create_sequence_for(:users) # <-- this line creates sequence table
+  create_sequence_for(:users) # <-- this line creates sequence table named `users_id_seq`
 
-This will creates sequence table.
-
-Next, add sequencer to the model:
+Next, add sequencer definition to the model:
 
   class User < ActiveRecord::Base
     turntable :id
-    sequencer # <-- this line enables sequencer module
+    sequencer :user_seq # <-- this line enables sequencer module
     has_one :status
   end
 
+=== Redis example
+
+First, add redis gem to your Gemfile:
+
+  gem 'redis'
+
+Then, add configuration to turntable.yml:
+
+* turntable.yml
+
+  development:
+    clusters:
+      user_cluster: # <-- cluster name
+        ....
+        seq:
+          seq_type: redis
+          connection: redis_sequencer # <-- redis sequencer name
+        shards:
+          - connection: user_shard_1
+          - connection: user_shard_2
+
+    redis: # <-- redis sequencer definition
+      redis_sequencer: # <-- redis sequencer name
+        host: 127.0.0.1 # <-- redis connection config
 
 === Transaction
     > user = User.find(2)

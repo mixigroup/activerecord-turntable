@@ -27,3 +27,15 @@ end
 def migrate(version)
   ActiveRecord::Migrator.run(:up, MIGRATIONS_ROOT, version)
 end
+
+module ActiveRecord::Turntable
+  module TestRackupFramework
+    def self.env
+      "test"
+    end
+    def self.root
+      File.dirname(File.dirname(__FILE__))
+    end
+  end
+  RackupFramework = TestRackupFramework
+end
