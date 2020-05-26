@@ -42,7 +42,7 @@ module ActiveRecord::Turntable
         raise "Please install the #{adapter} adapter: `gem install activerecord-#{adapter}-adapter` (#{e})"
       end
       adapter_method = "#{adapter}_connection"
-      ActiveRecord::Base::ConnectionSpecification.new(config, adapter_method)
+      ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(config, adapter_method)
     end
   end
 end

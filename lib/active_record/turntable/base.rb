@@ -62,7 +62,11 @@ module ActiveRecord::Turntable
       def turntable_replace_connection_pool
         ch = connection_handler
         cp = turntable_cluster.connection_proxy
-        if ActiveRecord::VERSION::STRING >= '3.2.0'
+        if ActiveRecord::VERSION::STRING >= '4.0.0'
+          proxy = PoolProxy.new(cp)
+          ch.send(:owner_to_pool)[name] = proxy
+          ch.send(:class_to_pool)[name] = proxy
+        elsif ActiveRecord::VERSION::STRING >= '3.2.0'
           ch.connection_pools[cp.spec] = PoolProxy.new(cp)
           ch.instance_variable_get(:@class_to_pool)[name] = ch.connection_pools[cp.spec]
         else
@@ -77,7 +81,7 @@ module ActiveRecord::Turntable
           raise "Please install the #{config['adapter']} adapter: `gem install activerecord-#{config['adapter']}-adapter` (#{e})"
         end
         adapter_method = "#{config['adapter']}_connection"
-        ActiveRecord::Base::ConnectionSpecification.new(config, adapter_method)
+        ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(config, adapter_method)
       end
 
       def clear_all_connections!

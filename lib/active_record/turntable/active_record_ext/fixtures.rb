@@ -3,7 +3,7 @@
 #
 require 'active_record/fixtures'
 module ActiveRecord
-  class Fixtures
+  class FixtureSet
     def self.create_fixtures(fixtures_directory, table_names, class_names = {})
       table_names = [table_names].flatten.map { |n| n.to_s }
       table_names.each { |n|
