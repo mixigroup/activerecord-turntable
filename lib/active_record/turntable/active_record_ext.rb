@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 module ActiveRecord::Turntable
   module ActiveRecordExt
     extend ActiveSupport::Concern

@@ -18,7 +18,7 @@ module ActiveRecord::Turntable
 
     def self.build(klass)
       seq_config_name = ActiveRecord::Base.turntable_config["clusters"][klass.turntable_cluster_name.to_s]["seq"]["connection"]
-      seq_config = ActiveRecord::Base.configurations[Rails.env]["seq"][seq_config_name]
+      seq_config = ActiveRecord::Base.configurations[ActiveRecord::Turntable::RackupFramework.env]["seq"][seq_config_name]
       seq_type = (seq_config["seq_type"] ? seq_config["seq_type"].to_sym : :mysql)
       @@tables[klass.table_name] ||= (@@sequences[sequence_name(klass.table_name, klass.primary_key)] ||= @@sequence_types[seq_type].new(klass, seq_config))
     end

@@ -1,7 +1,7 @@
 module ActiveRecord::Turntable
   class Shard
     DEFAULT_CONFIG = {
-      "connection" => (defined?(Rails) ? Rails.env : "development")
+      "connection" => (defined?(ActiveRecord::Turntable::RackupFramework) ? ActiveRecord::Turntable::RackupFramework.env : "development")
     }.with_indifferent_access
 
     def initialize(shard_spec)
@@ -28,7 +28,7 @@ module ActiveRecord::Turntable
     def retrieve_connection_pool
       ActiveRecord::Base.turntable_connections[name] ||=
         begin
-          config = ActiveRecord::Base.configurations[Rails.env]["shards"][name]
+          config = ActiveRecord::Base.configurations[ActiveRecord::Turntable::RackupFramework.env]["shards"][name]
           raise ArgumentError, "Unknown database config: #{name}, have #{ActiveRecord::Base.configurations.inspect}" unless config
           ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec_for(config))
         end
@@ -36,11 +36,12 @@ module ActiveRecord::Turntable
 
     def spec_for(config)
       begin
-        require "active_record/connection_adapters/#{config['adapter']}_adapter"
+        adapter = config['adapter'] || config[:adapter]
+        require "active_record/connection_adapters/#{adapter}_adapter"
       rescue LoadError => e
-        raise "Please install the #{config['adapter']} adapter: `gem install activerecord-#{config['adapter']}-adapter` (#{e})"
+        raise "Please install the #{adapter} adapter: `gem install activerecord-#{adapter}-adapter` (#{e})"
       end
-      adapter_method = "#{config['adapter']}_connection"
+      adapter_method = "#{adapter}_connection"
       ActiveRecord::Base::ConnectionSpecification.new(config, adapter_method)
     end
   end

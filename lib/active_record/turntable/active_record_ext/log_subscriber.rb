@@ -35,7 +35,15 @@ module ActiveRecord::Turntable
             return if 'SCHEMA' == payload[:name]
 
             name    = '%s (%.1fms)' % [payload[:name], event.duration]
-            shard = '[Shard: %s]' % (event.payload[:turntable_shard_name] ? event.payload[:turntable_shard_name] : nil)
+
+            connection = if event.payload[:turntable_shard_name]
+                           '[Shard: %s]' % event.payload[:turntable_shard_name]
+                         elsif event.payload[:connection_name]
+                           '[%s]' % event.payload[:connection_name]
+                         else
+                           '[unknown]'
+                         end
+
             sql     = payload[:sql].squeeze(' ')
             binds   = nil
 
@@ -47,18 +55,17 @@ module ActiveRecord::Turntable
 
             if odd?
               name = color(name, ActiveRecord::LogSubscriber::CYAN, true)
-              shard = color(shard, ActiveRecord::LogSubscriber::CYAN, true)
+              connection = color(connection, ActiveRecord::LogSubscriber::CYAN, true)
               sql  = color(sql, nil, true)
             else
               name = color(name, ActiveRecord::LogSubscriber::MAGENTA, true)
-              shard = color(shard, ActiveRecord::LogSubscriber::MAGENTA, true)
+              connection = color(connection, ActiveRecord::LogSubscriber::MAGENTA, true)
             end
 
-            debug "  #{name} #{shard} #{sql}#{binds}"
+            debug "  #{name} #{connection} #{sql}#{binds}"
           end
         end
       end
     end
   end
 end
-

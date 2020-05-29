@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 module ActiveRecord::Turntable::Migration
   extend ActiveSupport::Concern
 
@@ -14,6 +15,7 @@ module ActiveRecord::Turntable::Migration
     end
     base.class_eval do
       class_inheritable_accessor :target_shards
+      class_inheritable_accessor :target_seqs
     end
     ::ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, SchemaStatementsExt)
   end
@@ -22,6 +24,7 @@ module ActiveRecord::Turntable::Migration
   included do
     extend ShardDefinition
     class_attribute :target_shards
+    class_attribute :target_seqs
     def announce_with_turntable(message)
       announce_without_turntable("#{message} - #{get_current_shard}")
     end
@@ -36,18 +39,17 @@ module ActiveRecord::Turntable::Migration
   module ShardDefinition
     def clusters(*cluster_names)
       config = ActiveRecord::Base.turntable_config
-      (self.target_shards ||= []) <<
-        if cluster_names.first == :all
-          config['clusters'].map do |name, cluster_conf|
-            cluster_conf["shards"].map {|shard| shard["connection"]}
-          end
-        else
-          cluster_names.map do |cluster_name|
-            config['clusters'][cluster_name]["shards"].map do |shard|
-              shard["connection"]
-            end
-          end
+      if cluster_names.first == :all
+        config['clusters'].map do |name, cluster_conf|
+          (self.target_shards ||= []) << cluster_conf["shards"].map { |shard| shard["connection"] }
+          (self.target_seqs ||= []) << cluster_conf["seq"]["connection"]
         end
+      else
+        cluster_names.map do |cluster_name|
+          (self.target_shards ||= []) << config['clusters'][cluster_name]["shards"].map { |shard| shard["connection"] }
+          (self.target_seqs ||= []) << config['clusters'][cluster_name]["seq"]["connection"]
+        end
+      end
     end
 
     def shards(*connection_names)
@@ -62,19 +64,23 @@ module ActiveRecord::Turntable::Migration
   def migrate_with_turntable(direction)
     config = ActiveRecord::Base.configurations
     @@current_shard = nil
-    shards = (self.class.target_shards||=[]).flatten.uniq.compact
-    if self.class.target_shards.blank?
+    if self.class.target_shards.blank? || self.class.target_seqs.blank?
       return migrate_without_turntable(direction)
     end
 
+    shards = (self.class.target_shards||=[]).flatten.uniq.compact
     shards_conf = shards.map do |shard|
-      config[Rails.env||"development"]["shards"][shard]
+      config[ActiveRecord::Turntable::RackupFramework.env||"development"]["shards"][shard]
     end
-    seqs = config[Rails.env||"development"]["seq"]
-    shards_conf += seqs.values
-    shards_conf << config[Rails.env||"development"]
+
+    seqs = (self.class.target_seqs||=[]).flatten.uniq.compact
+    seqs_conf = config[ActiveRecord::Turntable::RackupFramework.env||"development"]["seq"].select { |key, val| seqs.include?(key) }
+    shards_conf += seqs_conf.values
+
+    # SHOW FULL FIELDS FROM `users` を実行してテーブルの情報を取得するためにデフォルトのデータベースも追加する
+    shards_conf << config[ActiveRecord::Turntable::RackupFramework.env||"development"]
     shards_conf.each_with_index do |conf, idx|
-      @@current_shard = (shards[idx] || seqs.keys[idx - shards.size] || "master")
+      @@current_shard = (shards[idx] || seqs_conf.keys[idx - shards.size] || "master")
       ActiveRecord::Base.establish_connection(conf)
       if !ActiveRecord::Base.connection.table_exists?(ActiveRecord::Migrator.schema_migrations_table_name())
         ActiveRecord::Base.connection.initialize_schema_migrations_table
@@ -85,11 +91,14 @@ module ActiveRecord::Turntable::Migration
 
   module SchemaStatementsExt
     def create_sequence_for(table_name, options = { })
+      options = options.merge(:id => false)
+
       # TODO: pkname should be pulled from table definitions
       pkname = "id"
       sequence_table_name = ActiveRecord::Turntable::Sequencer.sequence_name(table_name, "id")
-      create_table(sequence_table_name, options)
-      execute "ALTER TABLE #{quote_table_name(sequence_table_name)} MODIFY id bigint(20) DEFAULT NULL auto_increment NOT NULL;"
+      create_table(sequence_table_name, options) do |t|
+        t.integer :id, :limit => 8
+      end
       execute "INSERT INTO #{quote_table_name(sequence_table_name)} (`id`) VALUES (0)"
     end
 

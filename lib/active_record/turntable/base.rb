@@ -50,7 +50,7 @@ module ActiveRecord::Turntable
       end
 
       def force_connect_all_shards!
-        conf = configurations[Rails.env]
+        conf = configurations[ActiveRecord::Turntable::RackupFramework.env]
         shards = conf["shards"]
         shards = shards.merge(conf["seq"]) if conf["seq"]
         shards.each do |name, config|
