@@ -14,7 +14,7 @@ module ActiveRecord::Turntable
       @config[key]
     end
 
-    def self.load!(config_file = ActiveRecord::Base.turntable_config_file, env = (defined?(Rails) ? Rails.env : 'development'))
+    def self.load!(config_file = ActiveRecord::Base.turntable_config_file, env = (defined?(ActiveRecord::Turntable::RackupFramework) ? ActiveRecord::Turntable::RackupFramework.env : 'development')) # FIXME
       instance.load!(config_file, env)
     end
 

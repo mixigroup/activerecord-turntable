@@ -3,6 +3,10 @@ require 'active_record/tasks/database_tasks'
 module ActiveRecord
   module Tasks
     module DatabaseTasks
+      def env
+        @env ||= ActiveRecord::Turntable::RackupFramework.env
+      end
+
       def create_all_turntable_cluster
         each_local_turntable_cluster_configuration { |name, configuration|
           puts "[turntable] *** executing to database: #{configuration['database']}"

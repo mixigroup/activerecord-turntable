@@ -3,7 +3,7 @@ module ActiveRecord::Turntable
     module Connections; end
 
     DEFAULT_CONFIG = {
-      "connection" => (defined?(Rails) ? Rails.env : "development")
+      "connection" => (defined?(ActiveRecord::Turntable::RackupFramework) ? ActiveRecord::Turntable::RackupFramework.env : "development")
     }.with_indifferent_access
 
     attr_reader :name

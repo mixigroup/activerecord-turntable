@@ -41,7 +41,6 @@ module ActiveRecord::Turntable
         turntable_replace_connection_pool
       end
 
-
       def turntable_replace_connection_pool
         ch = connection_handler
         cp = ConnectionProxy.new(self, turntable_cluster)

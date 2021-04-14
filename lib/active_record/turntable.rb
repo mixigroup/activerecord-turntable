@@ -50,13 +50,16 @@ module ActiveRecord::Turntable
     include Base
   end
 
+  RackupFramework = Rails   if defined?(Rails);
+  RackupFramework = Padrino if defined?(Padrino);
+
   module ClassMethods
     DEFAULT_PATH = File.dirname(File.dirname(__FILE__))
 
     def turntable_config_file
       @@turntable_config_file ||=
-        File.join(defined?(::Rails) ?
-                   ::Rails.root.to_s : DEFAULT_PATH, 'config/turntable.yml')
+        File.join(defined?(ActiveRecord::Turntable::RackupFramework) ?
+                  ActiveRecord::Turntable::RackupFramework.root.to_s : DEFAULT_PATH, 'config/turntable.yml')
     end
 
     def turntable_config_file=(filename)
@@ -69,4 +72,5 @@ module ActiveRecord::Turntable
   end
 
   require "active_record/turntable/railtie" if defined?(Rails)
+  require "active_record/turntable/padrinotie" if defined?(Padrino)
 end

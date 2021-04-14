@@ -3,8 +3,9 @@ module ActiveRecord::Turntable::Migration
 
   included do
     extend ShardDefinition
-    class_attribute :target_shards, :current_shard
+    class_attribute :target_shards, :current_shard, :target_seqs
     alias_method_chain :announce, :turntable
+    alias_method_chain :migrate, :turntable
     alias_method_chain :exec_migration, :turntable
     ::ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:include, SchemaStatementsExt)
     ::ActiveRecord::Migration::CommandRecorder.send(:include, CommandRecorder)
@@ -13,19 +14,17 @@ module ActiveRecord::Turntable::Migration
 
   module ShardDefinition
     def clusters(*cluster_names)
-      config = ActiveRecord::Base.turntable_config
+      config = ActiveRecord::Base.turntable_config["clusters"]
+      cluster_names = config.keys if cluster_names.first == :all
       (self.target_shards ||= []).concat(
-        if cluster_names.first == :all
-          config['clusters'].map do |name, cluster_conf|
-            cluster_conf["shards"].map {|shard| shard["connection"]}
-          end
-        else
           cluster_names.map do |cluster_name|
-            config['clusters'][cluster_name]["shards"].map do |shard|
-              shard["connection"]
-            end
+            config[cluster_name]["shards"].map { |shard| shard["connection"] }
           end.flatten
-        end
+      )
+      (self.target_seqs ||= []).concat(
+          cluster_names.map do |cluster_name|
+            config[cluster_name]["seq"].values.map { |seq| seq["connection"] }
+          end.flatten
       )
     end
 
@@ -35,7 +34,8 @@ module ActiveRecord::Turntable::Migration
   end
 
   def target_shard?(shard_name)
-    target_shards.blank? or target_shards.include?(shard_name)
+    return false if shard_name.present? && target_shards.blank?
+    shard_name.nil? or target_shards.blank? or target_shards.include?(shard_name)
   end
 
   def announce_with_turntable(message)
@@ -43,7 +43,26 @@ module ActiveRecord::Turntable::Migration
   end
 
   def exec_migration_with_turntable(*args)
-    exec_migration_without_turntable(*args) if target_shard?(current_shard)
+    exec_migration_without_turntable(*args) # if target_shard?(current_shard)
+  end
+
+  def migrate_with_turntable(*args)
+    return migrate_without_turntable(*args) if target_shards.blank?
+
+    config = ActiveRecord::Base.configurations[ActiveRecord::Turntable::RackupFramework.env||"development"]
+    shard_conf = target_shards.map { |shard| [shard, config["shards"][shard]] }.to_h
+    seqs_conf = target_seqs.map { |seq| [seq, config["seq"][seq]] }.to_h
+
+    # SHOW FULL FIELDS FROM `users` を実行してテーブルの情報を取得するためにデフォルトのデータベースも追加する
+    {"master": config}.merge(shard_conf).merge(seqs_conf).each do |connection_name, database_config|
+      next if database_config["database"].blank?
+      ActiveRecord::Base.clear_active_connections!
+      ActiveRecord::Base.establish_connection(database_config)
+      ActiveRecord::Migration.current_shard = connection_name
+      migrate_without_turntable(*args)
+    end
+    ActiveRecord::Base.establish_connection config
+    ActiveRecord::Base.clear_active_connections!
   end
 
   module SchemaStatementsExt
@@ -114,28 +133,28 @@ module ActiveRecord::Turntable::Migration
       def up_with_turntable(migrations_paths, target_version = nil)
         up_without_turntable(migrations_paths, target_version)
 
-        ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
-          puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-          _original_up(migrations_paths, target_version)
-        end
+        # ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+        #   puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+        #   _original_up(migrations_paths, target_version)
+        # end
       end
 
       def down_with_turntable(migrations_paths, target_version = nil, &block)
         down_without_turntable(migrations_paths, target_version, &block)
 
-        ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
-          puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-          _original_down(migrations_paths, target_version, &block)
-        end
+        # ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+        #   puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+        #   _original_down(migrations_paths, target_version, &block)
+        # end
       end
 
       def run_with_turntable(*args)
         run_without_turntable(*args)
 
-        ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
-          puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
-          _original_run(*args)
-        end
+        # ActiveRecord::Tasks::DatabaseTasks.each_current_turntable_cluster_connected do |name, configuration|
+        #   puts "[turntable] *** Migrating database: #{configuration['database']}(Shard: #{name})"
+        #   _original_run(*args)
+        # end
       end
     end
   end

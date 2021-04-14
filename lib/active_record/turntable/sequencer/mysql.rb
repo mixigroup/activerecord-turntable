@@ -11,9 +11,10 @@ module ActiveRecord::Turntable
         @options = options
       end
 
-      def next_sequence_value(sequence_name)
+      # mysql だけ offset を指定できるようにします
+      def next_sequence_value(sequence_name, offset = 1)
         conn = @klass.connection.seq.connection
-        conn.execute "UPDATE #{@klass.connection.quote_table_name(sequence_name)} SET id=LAST_INSERT_ID(id+1)"
+        conn.execute "UPDATE #{@klass.connection.quote_table_name(sequence_name)} SET id=LAST_INSERT_ID(id+#{offset})"
         res = conn.execute("SELECT LAST_INSERT_ID()")
         new_id = res.first.first.to_i
         raise SequenceNotFoundError if new_id.zero?
