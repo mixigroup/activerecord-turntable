@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "barrage"
   spec.add_development_dependency "coveralls"
   spec.add_development_dependency "dalli", ">= 2.7"
-  spec.add_development_dependency "factory_bot"
+  spec.add_development_dependency "factory_bot", "6.4.4"
   spec.add_development_dependency "faker"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "guard-rubocop"
