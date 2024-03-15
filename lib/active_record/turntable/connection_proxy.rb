@@ -33,7 +33,7 @@ module ActiveRecord::Turntable
 
     def transaction(options = {}, &block)
       with_master {
-        connection.transaction(options, &block)
+        connection.transaction(**options, &block)
       }
     end
 
@@ -88,7 +88,9 @@ module ActiveRecord::Turntable
     def method_missing(method, *args, &block)
       clear_query_cache_if_needed(method)
       if shard_fixed?
-        connection.send(method, *args, &block)
+        args = args.dup
+        last_arg = args.last.is_a?(Hash) ? args.pop : {}
+        connection.send(method, *args, **last_arg, &block)
       elsif mixable?(method, *args)
         fader = @mixer.build_fader(method, *args, &block)
         logger.debug {

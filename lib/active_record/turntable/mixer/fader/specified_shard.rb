@@ -5,7 +5,9 @@ module ActiveRecord::Turntable
         def execute
           shard, query = @shards_query_hash.first
           @proxy.with_shard(shard) do
-            shard.connection.send(@called_method, query, *@args, &@block)
+            args = @args.dup
+            last_arg = @args.last.is_a?(Hash) ? args.pop : {}
+            shard.connection.send(@called_method, query, *args, **last_arg, &@block)
           end
         end
       end
