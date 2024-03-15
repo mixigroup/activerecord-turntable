@@ -21,7 +21,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.4'
-          # bundler: ${{ contains(fromJSON('["5_0_0", "5_0_1", "5_0_2", "5_0_3", "5_0_4", "5_1_0", "5_1_1", "5_1_2"]'), matrix.arversion) && '1.17.3' || 'latest' }}
+          bundler: ${{ contains(fromJSON('["5_0_0", "5_0_1", "5_0_2", "5_0_3", "5_0_4", "5_1_0", "5_1_1", "5_1_2"]'), matrix.arversion) && '1.17.3' || 'latest' }}
           bundler-cache: true
       - name: Start mysql
         run: sudo systemctl start mysql.service
