@@ -3,7 +3,7 @@ run-name: Matrix building for ruby 3.0 ✖️ 【rails 6.0】 🚀
 on: [push]
 
 jobs:
-  ruby_2_7:
+  ruby_3_0:
     strategy:
       fail-fast: false
       matrix:
