@@ -712,6 +712,9 @@ export TEST_MYSQL_PORT=13306
 bundle exec appraisal rails6_0_6 rake spec
 ```
 
+> [!note]
+> Ruby 2.3 or higher is required to run appraisal.
+
 ## Thanks
 
 ConnectionProxy, Distributed Migration implementation is inspired by Octopus and DataFabric.
