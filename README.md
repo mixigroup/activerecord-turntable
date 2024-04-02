@@ -713,7 +713,7 @@ bundle exec appraisal rails6_0_6 rake spec
 ```
 
 > [!note]
-> Ruby 2.3 or higher is required to run appraisal.
+> Appraisal does not work on Ruby 2.2 or lower.
 
 ## Thanks
 
