@@ -86,6 +86,13 @@ module ActiveRecord
 
       # Load fixtures once and begin transaction.
       if run_in_transaction?
+
+        # # Support AciveRecrd version 6.0.4
+        # # https://github.com/rails/rails/blame/v6.0.4/activerecord/lib/active_record/test_fixtures.rb#L115
+        if ActiveRecord::Turntable::Util.ar_version_equals_or_later?("6.0.4")
+          @saved_pool_configs = Hash.new { |hash, key| hash[key] = {} }
+        end
+
         if @@already_loaded_fixtures[self.class]
           @loaded_fixtures = @@already_loaded_fixtures[self.class]
         else

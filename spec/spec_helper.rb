@@ -35,7 +35,9 @@ MIGRATIONS_ROOT = File.expand_path(File.join(File.dirname(__FILE__), "migrations
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.
-ActiveRecord::Base.configurations = YAML.load_file(File.join(File.dirname(__FILE__), "config/database.yml"))
+database_yaml = File.read(File.join(File.dirname(__FILE__), "config/database.yml"))
+database_yaml = ERB.new(database_yaml).result
+ActiveRecord::Base.configurations = YAML.load(database_yaml)
 ActiveRecord::Base.establish_connection(:test)
 
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }

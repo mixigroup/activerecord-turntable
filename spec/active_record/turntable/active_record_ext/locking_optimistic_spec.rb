@@ -11,7 +11,11 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LockingOptimistic do
   let(:user_profile) { user.user_profile }
 
   describe "optimistic locking" do
-    subject { user_profile.update_attributes(birthday: Date.current) }
+    if ActiveRecord::Turntable::Util.ar60_or_later?
+      subject { user_profile.update(birthday: Date.current) }
+    else
+      subject { user_profile.update_attributes(birthday: Date.current) }
+    end
 
     it { expect { subject }.to change(user_profile, :lock_version).by(1) }
   end

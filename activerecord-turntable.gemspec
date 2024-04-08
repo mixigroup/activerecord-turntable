@@ -23,8 +23,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 2.2.2"
 
-  spec.add_runtime_dependency "activerecord",  ">= 5.0", "< 6.0"
-  spec.add_runtime_dependency "activesupport", ">= 5.0", "< 6.0"
+  spec.add_runtime_dependency "activerecord",  ">= 5.0", "< 7.0"
+  spec.add_runtime_dependency "activesupport", ">= 5.0", "< 7.0"
   spec.add_runtime_dependency "bsearch",       "~> 1.5"
   spec.add_runtime_dependency "sql_tree",      "= 0.2.0"
 
@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "barrage"
   spec.add_development_dependency "coveralls"
   spec.add_development_dependency "dalli", ">= 2.7"
-  spec.add_development_dependency "factory_bot"
+  spec.add_development_dependency "factory_bot", "<= 6.4.4"
   spec.add_development_dependency "faker"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "guard-rubocop"
@@ -61,4 +61,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "sqlite3", "~> 1.3.6"
+  spec.add_development_dependency "appraisal", "~> 2.5.0"
 end

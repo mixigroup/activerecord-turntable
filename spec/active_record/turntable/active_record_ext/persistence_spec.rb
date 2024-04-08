@@ -23,7 +23,13 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     let(:user) { create(:user, :created_yesterday) }
 
     context "When updating" do
-      subject { user.update_attributes!(nickname: new_nickname) }
+      subject {
+        if ActiveRecord::Turntable::Util.ar60_or_later?
+          user.update!(nickname: new_nickname)
+        else
+          user.update_attributes!(nickname: new_nickname)
+        end
+      }
 
       let(:new_nickname) { Faker::Name.unique.name }
 
@@ -73,7 +79,13 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
     let!(:user_item) { user.user_items.first }
 
     context "When updating" do
-      subject { user_item.update_attributes!(num: 2) }
+      subject {
+        if ActiveRecord::Turntable::Util.ar60_or_later?
+          user_item.update!(num: 2)
+        else
+          user_item.update_attributes!(num: 2)
+        end
+      }
 
       it { expect { subject }.not_to raise_error }
 
@@ -123,9 +135,16 @@ describe ActiveRecord::Turntable::ActiveRecordExt::Persistence do
 
   context "When the model is not sharded" do
     let(:item) { create(:item) }
+    let(:item_update_name) {
+      if ActiveRecord::Turntable::Util.ar60_or_later?
+        item.update(name: "hoge")
+      else
+        item.update_attributes(name: "hoge")
+      end
+    }
 
-    it { expect { item.update_attributes(name: "hoge") }.not_to raise_error }
-    it { expect { item.update_attributes(name: "hoge") }.to query_like(/WHERE `items`\.`id` = #{item.id}[^\s]*$/) }
+    it { expect { item_update_name }.not_to raise_error }
+    it { expect { item_update_name }.to query_like(/WHERE `items`\.`id` = #{item.id}[^\s]*$/) }
 
     it { expect { item.destroy! }.not_to raise_error }
     it { expect { item.destroy! }.to query_like(/WHERE `items`\.`id` = #{item.id}[^\s]*$/) }

@@ -1,0 +1,32 @@
+name: Exec Rspec
+run-name: Matrix building for ruby 2.7 ✖️ 【rails 5.0 - 6.0】 🚀
+on: [push]
+
+jobs:
+  ruby_2_7:
+    strategy:
+      fail-fast: false
+      matrix:
+        arversion: ['5_0_0', '5_0_1', '5_0_2', '5_0_3', '5_0_4', '5_0_5', '5_0_6', '5_0_7',
+                    '5_1_0', '5_1_1', '5_1_2', '5_1_3', '5_1_4', '5_1_5', '5_1_6', '5_1_7',
+                    '5_2_0', '5_2_1', '5_2_2', '5_2_3', '5_2_4', '5_2_5', '5_2_6', '5_2_7', '5_2_8',
+                    '6_0_0', '6_0_1', '6_0_2', '6_0_3', '6_0_4', '6_0_5', '6_0_6']
+    runs-on: ubuntu-22.04
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails${{ matrix.arversion }}.gemfile
+      MYSQL_PWD: root
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+          bundler: ${{ contains(fromJSON('["5_0_0", "5_0_1", "5_0_2", "5_0_3", "5_0_4", "5_1_0", "5_1_1", "5_1_2"]'), matrix.arversion) && '1.17.3' || 'latest' }}
+          bundler-cache: true
+      - name: Start mysql
+        run: sudo systemctl start mysql.service
+      - name: Reset DB
+        run: bundle exec rake turntable:db:reset
+      - name: Run RSpec
+        run: RUBYOPT='-W:deprecated' bundle exec rake spec
