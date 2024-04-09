@@ -709,6 +709,7 @@ bundle install
 bundle exec appraisal install
 export TEST_MYSQL_HOST=127.0.0.1
 export TEST_MYSQL_PORT=13306
+bundle exec rake turntable:db:reset
 bundle exec appraisal rails6_0_6 rake spec
 ```
 
