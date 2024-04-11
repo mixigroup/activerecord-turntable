@@ -3,6 +3,17 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require "rubygems"
 require "bundler/setup"
 
+# https://www.ruby-lang.org/ja/news/2020/10/02/ruby-2-7-2-released/
+# Feature #17000: 2.7.2 turns off deprecation warnings by default
+# https://bugs.ruby-lang.org/issues/17000
+ruby_version = Gem::Version.create(RUBY_VERSION)
+ruby27_version = Gem::Version.create("2.7.2")
+if ruby_version >= ruby27_version
+  if ENV["WARNING"]
+    Warning[:deprecated] = true
+  end
+end
+
 require "rails"
 require "action_view"
 require "action_dispatch"

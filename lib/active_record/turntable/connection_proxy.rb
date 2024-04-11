@@ -33,7 +33,7 @@ module ActiveRecord::Turntable
 
     def transaction(options = {}, &block)
       with_master {
-        connection.transaction(options, &block)
+        connection.transaction(**options, &block)
       }
     end
 
