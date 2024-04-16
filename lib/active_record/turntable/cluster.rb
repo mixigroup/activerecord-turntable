@@ -45,11 +45,11 @@ module ActiveRecord::Turntable
       end
       shard = to_shard(shards.shift)
       if shards.present?
-        shard.connection.transaction(options) do
+        shard.connection.transaction(**options) do
           shards_transaction(shards, options, true, &block)
         end
       else
-        shard.connection.transaction(options) do
+        shard.connection.transaction(**options) do
           yield
         end
       end

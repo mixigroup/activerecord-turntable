@@ -53,10 +53,10 @@ appraise "rails6_0_5" do
 end
 
 appraise "rails6_0_6" do
-  gem "rails", "6.0.6"
-  gem "railties", "6.0.6"
-  gem "activerecord", "6.0.6"
-  gem "activesupport", "6.0.6"
-  gem "actionview", "6.0.6"
+  gem "rails", "~> 6.0.6.1"
+  gem "railties", "~> 6.0.6.1"
+  gem "activerecord", "~> 6.0.6.1"
+  gem "activesupport", "~> 6.0.6.1"
+  gem "actionview", "~> 6.0.6.1"
   gem "mysql2", "~> 0.5.2"
 end

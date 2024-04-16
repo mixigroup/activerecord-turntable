@@ -72,18 +72,18 @@ module ActiveRecord::Turntable::Migration
   end
 
   module SchemaStatementsExt
-    def create_sequence_for(table_name, options = {})
+    def create_sequence_for(table_name, **options)
       options = options.merge(id: false)
 
       # TODO: pkname should be pulled from table definitions
       sequence_table_name = ActiveRecord::Turntable::Sequencer.sequence_name(table_name, "id")
-      create_table(sequence_table_name, options) do |t|
+      create_table(sequence_table_name, **options) do |t|
         t.integer :id, limit: 8
       end
       execute "INSERT INTO #{quote_table_name(sequence_table_name)} (`id`) VALUES (0)"
     end
 
-    def drop_sequence_for(table_name, options = {})
+    def drop_sequence_for(table_name, **options)
       # TODO: pkname should be pulled from table definitions
       sequence_table_name = ActiveRecord::Turntable::Sequencer.sequence_name(table_name, "id")
       drop_table(sequence_table_name)

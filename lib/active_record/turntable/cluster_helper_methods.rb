@@ -21,11 +21,11 @@ module ActiveRecord::Turntable
       def recursive_transaction(pools, options, &block)
         pool = pools.shift
         if pools.present?
-          pool.connection.transaction(options) do
+          pool.connection.transaction(**options) do
             recursive_transaction(pools, options, &block)
           end
         else
-          pool.connection.transaction(options, &block)
+          pool.connection.transaction(**options, &block)
         end
       end
 
