@@ -2,12 +2,16 @@ require "active_record/associations"
 
 module ActiveRecord::Turntable
   module ActiveRecordExt
+    module Builder
+      module Association
+        def valid_options(options)
+          super + [:foreign_shard_key]
+        end
+      end
+    end
+
     module Association
       include ShardingCondition
-
-      def self.prepended(mod)
-        ActiveRecord::Associations::Builder::Association::VALID_OPTIONS << :foreign_shard_key
-      end
 
       protected
 
