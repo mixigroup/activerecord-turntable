@@ -45,7 +45,12 @@ module ActiveRecord
           yield(name, configuration)
         end
         ActiveRecord::Base.clear_active_connections!
-        ActiveRecord::Base.establish_connection old_connection_pool.spec.config
+        config = if old_connection_pool.respond_to?(:db_config)
+                   old_connection_pool.db_config.configuration_hash
+                 else
+                   old_connection_pool.spec.config
+                 end
+        ActiveRecord::Base.establish_connection config
       end
 
       def each_current_turntable_cluster_configuration(environment)
