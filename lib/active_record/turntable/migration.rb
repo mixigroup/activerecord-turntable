@@ -52,7 +52,13 @@ module ActiveRecord::Turntable::Migration
     def migrate(*args)
       return super(*args) if target_shards.blank?
 
-      config = ActiveRecord::Base.configurations[ActiveRecord::Turntable::RackupFramework.env||"development"]
+      env = ActiveRecord::Turntable::RackupFramework.env || "development"
+      config = if ActiveRecord::Turntable::Util.ar_version_equals_or_later?("6.1.0")
+                 configs = ActiveRecord::Base.configurations.configs_for(env_name: env.to_s).map(&:configuration_hash)
+                 configs.find { |conf| conf.key?("shards") || conf.key?(:shards) }&.stringify_keys
+               else
+                 ActiveRecord::Base.configurations[env]
+               end
       shard_conf = target_shards.map { |shard| [shard, config["shards"][shard]] }.to_h
       seqs_conf = target_seqs.map { |seq| [seq, config["seq"][seq]] }.to_h
 
