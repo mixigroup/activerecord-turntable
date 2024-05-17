@@ -61,6 +61,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bcrypt", "~> 3.1.11"
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "mocha"
-  spec.add_development_dependency "sqlite3", "~> 1.3.6"
+  spec.add_development_dependency "sqlite3", ">= 1.4.2"
   spec.add_development_dependency "appraisal", "~> 2.5.0"
 end
