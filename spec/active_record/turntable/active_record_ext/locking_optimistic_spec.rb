@@ -22,7 +22,11 @@ describe ActiveRecord::Turntable::ActiveRecordExt::LockingOptimistic do
 
   describe "Json serialized column is saved" do
     before do
-      user_profile.update_attributes(data: { foo: "bar" })
+      if ActiveRecord::Turntable::Util.ar60_or_later?
+        user_profile.update(data: { foo: "bar" })
+      else
+        user_profile.update_attributes(data: { foo: "bar" })
+      end
       user_profile.reload
     end
 

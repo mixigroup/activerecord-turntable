@@ -1,4 +1,5 @@
 require "active_record/turntable/connection_proxy/mixable"
+require "thread_safe"
 
 module ActiveRecord::Turntable
   class ConnectionProxy
