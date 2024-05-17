@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "activesupport", ">= 5.0", "< 7.0"
   spec.add_runtime_dependency "bsearch",       "~> 1.5"
   spec.add_runtime_dependency "sql_tree",      "= 0.2.0"
+  spec.add_runtime_dependency "thread_safe"
 
   # optional dependencies
   spec.add_development_dependency "activerecord-import"
