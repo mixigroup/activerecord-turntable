@@ -13,6 +13,7 @@ jobs:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails${{ matrix.arversion }}.gemfile
       MYSQL_PWD: root
       DATABASE_ADAPTER: trilogy
+      DATABASE_PASSWORD: root
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
