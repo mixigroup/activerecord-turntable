@@ -8,7 +8,11 @@ describe ActiveRecord::Turntable::Shard do
 
 
     its(:name) { is_expected.to eq("user_shard_1") }
-    its(:connection) { is_expected.to be_instance_of(ActiveRecord::ConnectionAdapters::Mysql2Adapter) }
+    if ENV["DATABASE_ADAPTER"] == "trilogy"
+      its(:connection) { is_expected.to be_instance_of(ActiveRecord::ConnectionAdapters::TrilogyAdapter) }
+    else
+      its(:connection) { is_expected.to be_instance_of(ActiveRecord::ConnectionAdapters::Mysql2Adapter) }
+    end
     its(:connection_pool) { is_expected.to be_instance_of(ActiveRecord::ConnectionAdapters::ConnectionPool) }
   end
 

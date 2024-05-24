@@ -32,7 +32,12 @@ describe ActiveRecord::Turntable::Base do
 
     it "closes all connections" do
       expect { subject }.to change {
-        ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::Mysql2Adapter).count { |conn| conn.active? } }.to(0)
+        if ENV["DATABASE_ADAPTER"] == "trilogy"
+          ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::TrilogyAdapter).count { |conn| conn.active? }
+        else
+          ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::Mysql2Adapter).count { |conn| conn.active? }
+        end
+      }.to(0)
     end
 
     context "In forked child process" do
