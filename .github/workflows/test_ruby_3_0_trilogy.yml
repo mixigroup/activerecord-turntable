@@ -24,7 +24,9 @@ jobs:
           bundler: latest
           bundler-cache: true
       - name: Start mysql
-        run: sudo systemctl start mysql.service
+        run: |
+          sudo systemctl start mysql.service
+          mysql -h 127.0.0.1 --port 3306 -u root --password=root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
       - name: Reset DB
         run: bundle exec rake turntable:db:reset
       - name: Run RSpec
