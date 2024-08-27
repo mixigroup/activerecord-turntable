@@ -6,7 +6,7 @@ require "active_record/turntable/active_record_ext/fixtures"
 describe ActiveRecord::FixtureSet do
   let(:fixtures_root) { File.join(File.dirname(__FILE__), "../../../fixtures") }
   let(:fixture_file) { File.join(fixtures_root, "items.yml") }
-  let(:items) { YAML.load(ERB.new(IO.read(fixture_file)).result) }
+  let(:items) { YAML.safe_load(ERB.new(IO.read(fixture_file)).result) }
 
   before do
     ActiveRecord::FixtureSet.reset_cache

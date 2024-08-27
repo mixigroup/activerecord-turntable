@@ -12,7 +12,7 @@ describe ActiveRecord::TestFixtures do
   let(:fixture_file) { File.join(fixtures_root, "items.yml") }
   let(:test_fixture_class) { Class.new(ActiveSupport::TestCase) { include ActiveRecord::TestFixtures } }
   let(:test_fixture) { test_fixture_class.new("test") }
-  let(:items) { YAML.load(ERB.new(IO.read(fixture_file)).result) }
+  let(:items) { YAML.safe_load(ERB.new(IO.read(fixture_file)).result) }
 
   describe "#setup_fixtures" do
     after do
