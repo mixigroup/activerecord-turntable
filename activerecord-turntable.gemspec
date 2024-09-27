@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "activesupport", ">= 5.0", "< 7.0"
   spec.add_runtime_dependency "bsearch",       "~> 1.5"
   spec.add_runtime_dependency "sql_tree",      "= 0.2.0"
+  spec.add_runtime_dependency "thread_safe"
 
   # optional dependencies
   spec.add_development_dependency "activerecord-import"
@@ -49,7 +50,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-collection_matchers"
   spec.add_development_dependency "rspec-its"
   spec.add_development_dependency "rspec-parameterized"
-  spec.add_development_dependency "rspec-rails"
+  spec.add_development_dependency "rspec-rails", "~> 4.1.0"
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "rubocop-rspec"
   spec.add_development_dependency "timecop"
@@ -60,6 +61,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bcrypt", "~> 3.1.11"
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "mocha"
-  spec.add_development_dependency "sqlite3", "~> 1.3.6"
+  spec.add_development_dependency "sqlite3", ">= 1.4.2"
   spec.add_development_dependency "appraisal", "~> 2.5.0"
 end

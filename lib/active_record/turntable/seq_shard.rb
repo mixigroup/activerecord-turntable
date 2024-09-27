@@ -17,7 +17,12 @@ module ActiveRecord::Turntable
           klass = Class.new(ActiveRecord::Base)
           Connections.const_set(name.classify, klass)
           klass.abstract_class = true
-          klass.establish_connection ActiveRecord::Base.connection_pool.spec.config[:seq][name].with_indifferent_access
+          config = if ActiveRecord::Base.connection_pool.respond_to?(:db_config)
+                     ActiveRecord::Base.connection_pool.db_config.configuration_hash
+                   else
+                     ActiveRecord::Base.connection_pool.spec.config
+                   end
+          klass.establish_connection config[:seq][name].with_indifferent_access
         end
         klass
       end
