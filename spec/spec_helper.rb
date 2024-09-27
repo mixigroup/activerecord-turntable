@@ -11,6 +11,13 @@ require "action_controller"
 require "activerecord-turntable"
 require "active_record/turntable/active_record_ext/fixtures"
 
+ActiveSupport.on_load(:active_record) do
+  if ENV["DATABASE_ADAPTER"] == "trilogy"
+    require "trilogy_adapter/connection"
+    ActiveRecord::Base.public_send :extend, TrilogyAdapter::Connection
+  end
+end
+
 require "rspec/its"
 require "rspec/collection_matchers"
 require "rspec/parameterized"

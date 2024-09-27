@@ -61,6 +61,15 @@ appraise "rails6_0_6" do
   gem "mysql2", "~> 0.5.2"
 end
 
+appraise "rails6_0_6_trilogy" do
+  gem "rails", "~> 6.0.6.1"
+  gem "railties", "~> 6.0.6.1"
+  gem "activerecord", "~> 6.0.6.1"
+  gem "activerecord-trilogy-adapter", "~> 3.1.2"
+  gem "activesupport", "~> 6.0.6.1"
+  gem "actionview", "~> 6.0.6.1"
+end
+
 appraise "rails6_1_0" do
   gem "rails", "~> 6.1.0.0"
   gem "railties", "~> 6.1.0.0"
@@ -131,4 +140,13 @@ appraise "rails6_1_7" do
   gem "activesupport", "~> 6.1.7.0"
   gem "actionview", "~> 6.1.7.0"
   gem "mysql2", "~> 0.5.2"
+end
+
+appraise "rails6_1_7_trilogy" do
+  gem "rails", "~> 6.1.7.0"
+  gem "railties", "~> 6.1.7.0"
+  gem "activerecord", "~> 6.1.7.0"
+  gem "activerecord-trilogy-adapter", "~> 3.1.2"
+  gem "activesupport", "~> 6.1.7.0"
+  gem "actionview", "~> 6.1.7.0"
 end

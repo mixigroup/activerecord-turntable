@@ -1,0 +1,33 @@
+name: Exec Rspec
+run-name: Matrix building for ruby 3.0 ✖️ 【rails 6.0】✖️ Trilogy 🚀
+on: [push]
+
+jobs:
+  ruby_3_0:
+    strategy:
+      fail-fast: false
+      matrix:
+        arversion: ['6_0_6_trilogy', '6_1_7_trilogy']
+    runs-on: ubuntu-22.04
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails${{ matrix.arversion }}.gemfile
+      MYSQL_PWD: root
+      DATABASE_ADAPTER: trilogy
+      DATABASE_PASSWORD: root
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler: latest
+          bundler-cache: true
+      - name: Start mysql
+        run: |
+          sudo systemctl start mysql.service
+          mysql -h 127.0.0.1 --port 3306 -u root --password=root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
+      - name: Reset DB
+        run: bundle exec rake turntable:db:reset
+      - name: Run RSpec
+        run: RUBYOPT='-W:deprecated' bundle exec rake spec

@@ -8,6 +8,13 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
 end
 
 require "active_record"
+ActiveSupport.on_load(:active_record) do
+  if ENV["DATABASE_ADAPTER"] == "trilogy"
+    require "trilogy_adapter/connection"
+    ActiveRecord::Base.public_send :extend, TrilogyAdapter::Connection
+  end
+end
+
 require "active_record/turntable/active_record_ext/database_tasks"
 
 namespace :turntable do

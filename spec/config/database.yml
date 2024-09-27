@@ -1,7 +1,7 @@
 default: &default
-  adapter: mysql2
+  adapter: <%= ENV.fetch("DATABASE_ADAPTER", "mysql2") %>
   username: root
-  password:
+  password: <%= ENV.fetch("DATABASE_PASSWORD", "") %>
   host: <%= ENV['TEST_MYSQL_HOST'] || 'localhost' %>
   port: <%= ENV['TEST_MYSQL_PORT'] || 3306 %>
   encoding: utf8
