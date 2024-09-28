@@ -14,7 +14,7 @@ module ActiveRecord::Turntable
       end
 
       def load(env)
-        yaml = YAML.load(ERB.new(IO.read(path)).result).with_indifferent_access[env]
+        yaml = YAML.safe_load(ERB.new(IO.read(path)).result, permitted_classes: [Symbol], aliases: true).with_indifferent_access[env]
         load_clusters(yaml[:clusters])
         load_global_settings(yaml)
 

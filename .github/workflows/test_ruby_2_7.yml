@@ -1,5 +1,5 @@
 name: Exec Rspec
-run-name: Matrix building for ruby 2.7 ✖️ 【rails 5.0 - 6.0】 🚀
+run-name: Matrix building for ruby 2.7 ✖️ 【rails 5.0 - 6.1】 🚀
 on: [push]
 
 jobs:

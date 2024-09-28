@@ -1,14 +1,13 @@
 name: Exec Rspec
-run-name: Matrix building for ruby 3.0 ✖️ 【rails 6.0 - 6.1】 🚀
+run-name: Matrix building for ruby 3.2 ✖️ 【rails 6.1】 🚀
 on: [push]
 
 jobs:
-  ruby_3_0:
+  ruby_3_2:
     strategy:
       fail-fast: false
       matrix:
-        arversion: ['6_0_6',
-                    '6_1_0', '6_1_1', '6_1_2', '6_1_3', '6_1_4', '6_1_5', '6_1_6', '6_1_7']
+        arversion: ['6_1_0', '6_1_1', '6_1_2', '6_1_3', '6_1_4', '6_1_5', '6_1_6', '6_1_7']
     runs-on: ubuntu-22.04
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails${{ matrix.arversion }}.gemfile
@@ -19,7 +18,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
+          ruby-version: '3.2'
           bundler: latest
           bundler-cache: true
       - name: Start mysql
