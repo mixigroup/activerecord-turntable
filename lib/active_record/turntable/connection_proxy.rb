@@ -86,14 +86,12 @@ module ActiveRecord::Turntable
     end
 
     # rubocop:disable Style/MethodMissing
-    def method_missing(method, *args, &block)
+    def method_missing(method, *args, **kwargs, &block)
       clear_query_cache_if_needed(method)
-      args = args.dup
-      last_arg = args.last.is_a?(Hash) ? args.pop : {}
       if shard_fixed?
-        connection.send(method, *args, **last_arg, &block)
+        connection.send(method, *args, **kwargs, &block)
       elsif mixable?(method, *args)
-        fader = @mixer.build_fader(method, *args, **last_arg, &block)
+        fader = @mixer.build_fader(method, *args, **kwargs, &block)
         logger.debug {
           "[ActiveRecord::Turntable] Sending method: #{method}, " \
           "sql: #{args.first}, " \
@@ -101,7 +99,7 @@ module ActiveRecord::Turntable
         }
         fader.execute
       else
-        connection.send(method, *args, **last_arg, &block)
+        connection.send(method, *args, **kwargs, &block)
       end
     end
     # rubocop:enable Style/MethodMissing
