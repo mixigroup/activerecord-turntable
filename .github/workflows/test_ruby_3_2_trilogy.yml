@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arversion: ['7_0_8_trilogy']
+        arversion: ['7_0_8_trilogy', '7_1_4_trilogy']
     runs-on: ubuntu-22.04
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails${{ matrix.arversion }}.gemfile
