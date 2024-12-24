@@ -44,7 +44,7 @@ MIGRATIONS_ROOT = File.expand_path(File.join(File.dirname(__FILE__), "migrations
 # in ./support/ and its subdirectories.
 database_yaml = File.read(File.join(File.dirname(__FILE__), "config/database.yml"))
 database_yaml = ERB.new(database_yaml).result
-ActiveRecord::Base.legacy_connection_handling = false if ActiveRecord::Base.respond_to?(:legacy_connection_handling=)
+ActiveRecord.legacy_connection_handling = false unless ActiveRecord::Turntable::Util.ar71_or_later?
 ActiveRecord::Base.configurations = YAML.safe_load(database_yaml, permitted_classes: [Symbol], aliases: true)
 ActiveRecord::Base.establish_connection(:test)
 

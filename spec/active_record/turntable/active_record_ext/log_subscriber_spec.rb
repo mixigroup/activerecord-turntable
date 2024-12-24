@@ -3,7 +3,11 @@ require "spec_helper"
 describe ActiveRecord::Turntable::ActiveRecordExt::LogSubscriber do
   REGEXP_MAGENTA = Regexp.escape(ActiveRecord::LogSubscriber::MAGENTA)
   REGEXP_CYAN = Regexp.escape(ActiveRecord::LogSubscriber::CYAN)
-  REGEXP_CLEAR = Regexp.escape(ActiveRecord::LogSubscriber::CLEAR)
+  if ActiveRecord::Turntable::Util.ar71_or_later?
+    REGEXP_CLEAR = Regexp.escape("\e[#{ActiveRecord::LogSubscriber::MODES[:clear]}m")
+  else
+    REGEXP_CLEAR = Regexp.escape(ActiveRecord::LogSubscriber::CLEAR)
+  end
 
   class TestLogSubscriber < ActiveRecord::LogSubscriber
     attr_reader :debugs
