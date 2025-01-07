@@ -71,7 +71,7 @@ module ActiveRecord::Turntable::Migration
         self.current_shard = current_shard_name
         super(*args)
       end
-      ActiveRecord::Base.clear_active_connections!
+      ActiveRecord::Base.connection_handler.clear_active_connections!
       ActiveRecord::Base.establish_connection config
       self.current_shard = nil
     end
