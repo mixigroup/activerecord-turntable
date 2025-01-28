@@ -9,7 +9,7 @@ end
 
 require "active_record"
 ActiveSupport.on_load(:active_record) do
-  if ENV["DATABASE_ADAPTER"] == "trilogy"
+  if ENV["DATABASE_ADAPTER"] == "trilogy" && !ActiveRecord::Turntable::Util.ar71_or_later?
     require "trilogy_adapter/connection"
     ActiveRecord::Base.public_send :extend, TrilogyAdapter::Connection
   end
@@ -49,7 +49,7 @@ namespace :turntable do
       ActiveRecord::Base.include(ActiveRecord::Turntable)
       ActiveRecord::ConnectionAdapters::SchemaStatements.include(ActiveRecord::Turntable::Migration::SchemaStatementsExt)
 
-      configurations = [ActiveRecord::Base.configurations[RAILS_ENV]]
+      configurations = ActiveRecord::Base.configurations.configs_for(env_name: RAILS_ENV)
       configurations += ActiveRecord::Tasks::DatabaseTasks.current_turntable_cluster_configurations(RAILS_ENV).map { |v| v[1] }.flatten.uniq
 
       configurations.each do |configuration|

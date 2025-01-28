@@ -65,13 +65,13 @@ module ActiveRecord::Turntable::Migration
       # SHOW FULL FIELDS FROM `users` を実行してテーブルの情報を取得するためにデフォルトのデータベースも追加する
       {"master": config}.merge(shard_conf).merge(seqs_conf).each do |connection_name, database_config|
         next if database_config["database"].blank?
-        ActiveRecord::Base.clear_active_connections!
+        ActiveRecord::Base.connection_handler.clear_active_connections!
         ActiveRecord::Base.establish_connection(database_config)
         current_shard_name = connection_name == :master ? nil : connection_name
         self.current_shard = current_shard_name
         super(*args)
       end
-      ActiveRecord::Base.clear_active_connections!
+      ActiveRecord::Base.connection_handler.clear_active_connections!
       ActiveRecord::Base.establish_connection config
       self.current_shard = nil
     end

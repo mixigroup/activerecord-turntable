@@ -23,8 +23,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 2.2.2"
 
-  spec.add_runtime_dependency "activerecord",  ">= 5.0", "< 7.0"
-  spec.add_runtime_dependency "activesupport", ">= 5.0", "< 7.0"
+  spec.add_runtime_dependency "activerecord",  ">= 7.0", "< 8.0"
+  spec.add_runtime_dependency "activesupport", ">= 7.0", "< 8.0"
   spec.add_runtime_dependency "bsearch",       "~> 1.5"
   spec.add_runtime_dependency "sql_tree",      "= 0.2.0"
   spec.add_runtime_dependency "thread_safe"
@@ -40,6 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard-rubocop"
   spec.add_development_dependency "httpclient", ">= 0"
   spec.add_development_dependency "mysql2", ">= 0.4.4", "< 0.6.0"
+  spec.add_development_dependency "trilogy", ">= 2.4.0"
   spec.add_development_dependency "onkcop"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-byebug"
@@ -50,7 +51,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-collection_matchers"
   spec.add_development_dependency "rspec-its"
   spec.add_development_dependency "rspec-parameterized"
-  spec.add_development_dependency "rspec-rails", "~> 4.1.0"
+  spec.add_development_dependency "rspec-rails", ">= 6.1.0"
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "rubocop-rspec"
   spec.add_development_dependency "timecop"

@@ -9,18 +9,11 @@ module ActiveRecord::Turntable
       end
 
       def translate_exception_class(e, sql, binds)
-        begin
-          message = "#{e.class.name}: #{e.message}: #{sql} : #{turntable_shard_name}"
-        rescue Encoding::CompatibilityError
-          message = "#{e.class.name}: #{e.message.force_encoding sql.encoding}: #{sql} : #{turntable_shard_name}"
-        end
+        message = "#{e.class.name}: #{e.message} : #{turntable_shard_name}"
 
-        exception =
-          if Util.ar60_or_later?
-            translate_exception(e, message: message, sql: sql, binds: binds)
-          else
-            translate_exception(e, message)
-          end
+        exception = translate_exception(
+          e, message: message, sql: sql, binds: binds
+        )
         exception.set_backtrace e.backtrace
         exception
       end

@@ -1,5 +1,5 @@
-name: Exec Rspec
-run-name: Matrix building for ruby 3.0 ✖️ 【rails 6.0】✖️ Trilogy 🚀
+name: Exec Rspec (Ruby 3.0 + Trilogy)
+run-name: Matrix building for ruby 3.0 ✖️ 【rails 7.x】✖️ Trilogy 🚀
 on: [push]
 
 jobs:
@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arversion: ['6_0_6_trilogy', '6_1_7_trilogy']
+        arversion: ['7_0_8_trilogy', '7_1_4_trilogy']
     runs-on: ubuntu-22.04
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails${{ matrix.arversion }}.gemfile
