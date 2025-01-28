@@ -1,4 +1,4 @@
-name: Exec Rspec
+name: Exec Rspec (Ruby 3.2 + Trilogy)
 run-name: Matrix building for ruby 3.2 ✖️ 【rails 7.x】✖️ Trilogy 🚀
 on: [push]
 

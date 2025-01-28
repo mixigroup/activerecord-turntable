@@ -1,4 +1,4 @@
-name: Exec Rspec
+name: Exec Rspec (Ruby 3.3)
 run-name: Matrix building for ruby 3.3 ✖️ 【rails 7.x】 🚀
 on: [push]
 
