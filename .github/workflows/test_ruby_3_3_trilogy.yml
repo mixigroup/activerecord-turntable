@@ -1,29 +1,32 @@
 name: Exec Rspec
-run-name: Matrix building for ruby 3.2 ✖️ 【rails 7.x】 🚀
+run-name: Matrix building for ruby 3.3 ✖️ 【rails 7.x】✖️ Trilogy 🚀
 on: [push]
 
 jobs:
-  ruby_3_2:
+  ruby_3_3:
     strategy:
       fail-fast: false
       matrix:
-        arversion: ['7_0_6', '7_0_7', '7_0_8',
-                    '7_1_2', '7_1_3', '7_1_4']
+        arversion: ['7_0_8_trilogy', '7_1_4_trilogy']
     runs-on: ubuntu-22.04
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails${{ matrix.arversion }}.gemfile
       MYSQL_PWD: root
+      DATABASE_ADAPTER: trilogy
+      DATABASE_PASSWORD: root
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.3'
           bundler: latest
           bundler-cache: true
       - name: Start mysql
-        run: sudo systemctl start mysql.service
+        run: |
+          sudo systemctl start mysql.service
+          mysql -h 127.0.0.1 --port 3306 -u root --password=root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
       - name: Reset DB
         run: bundle exec rake turntable:db:reset
       - name: Run RSpec

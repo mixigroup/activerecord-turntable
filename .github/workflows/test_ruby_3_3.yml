@@ -1,9 +1,9 @@
 name: Exec Rspec
-run-name: Matrix building for ruby 3.2 ✖️ 【rails 7.x】 🚀
+run-name: Matrix building for ruby 3.3 ✖️ 【rails 7.x】 🚀
 on: [push]
 
 jobs:
-  ruby_3_2:
+  ruby_3_3:
     strategy:
       fail-fast: false
       matrix:
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.3'
           bundler: latest
           bundler-cache: true
       - name: Start mysql
