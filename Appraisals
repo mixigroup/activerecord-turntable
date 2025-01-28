@@ -5,6 +5,7 @@ appraise "rails7_0_6" do
   gem "activesupport", "~> 7.0.6.0"
   gem "actionview", "~> 7.0.6.0"
   gem "mysql2", "~> 0.5.2"
+  gem "concurrent-ruby", "< 1.3.5"
 end
 
 appraise "rails7_0_7" do
@@ -14,6 +15,7 @@ appraise "rails7_0_7" do
   gem "activesupport", "~> 7.0.7.0"
   gem "actionview", "~> 7.0.7.0"
   gem "mysql2", "~> 0.5.2"
+  gem "concurrent-ruby", "< 1.3.5"
 end
 
 appraise "rails7_0_8" do
@@ -23,6 +25,7 @@ appraise "rails7_0_8" do
   gem "activesupport", "~> 7.0.8.0"
   gem "actionview", "~> 7.0.8.0"
   gem "mysql2", "~> 0.5.2"
+  gem "concurrent-ruby", "< 1.3.5"
 end
 
 appraise "rails7_0_8_trilogy" do
@@ -32,6 +35,7 @@ appraise "rails7_0_8_trilogy" do
   gem "activerecord-trilogy-adapter", "~> 3.1.2"
   gem "activesupport", "~> 7.0.8.0"
   gem "actionview", "~> 7.0.8.0"
+  gem "concurrent-ruby", "< 1.3.5"
 end
 
 appraise "rails7_1_2" do
