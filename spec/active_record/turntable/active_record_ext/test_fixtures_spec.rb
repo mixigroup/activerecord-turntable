@@ -5,7 +5,11 @@ require "active_record/turntable/active_record_ext/fixtures"
 
 describe ActiveRecord::TestFixtures do
   before do
-    test_fixture_class.fixture_path = fixtures_root
+    if ActiveRecord::Turntable::Util.ar71_or_later?
+      test_fixture_class.fixture_paths = [fixtures_root]
+    else
+      test_fixture_class.fixture_path = fixtures_root
+    end
   end
 
   let(:fixtures_root) { File.join(File.dirname(__FILE__), "../../../fixtures") }

@@ -8,8 +8,9 @@ module ActiveRecord::Turntable
         ensure_finalize = !klass.connection.transaction_open? if Util.ar61_or_later?
 
         status = nil
-        if self.new_record? && self.turntable_shard_key.to_s == klass.primary_key &&
-            self.id.nil? && klass.prefetch_primary_key?
+        # trilogy が auto increment ベースで INSERT 後の ID を取得しようとするため
+        # new_record の場合は、常に ID へ sequencer の値をセットする
+        if self.new_record? && self.id.nil? && klass.prefetch_primary_key?
           self.id = klass.next_sequence_value
         end
         self.class.connection.shards_transaction([self.turntable_shard]) do

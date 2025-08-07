@@ -1,5 +1,5 @@
-name: Exec Rspec
-run-name: Matrix building for ruby 3.2 ✖️ 【rails 6.1】 🚀
+name: Exec Rspec (Ruby 3.2)
+run-name: Matrix building for ruby 3.2 ✖️ 【rails 7.x】 🚀
 on: [push]
 
 jobs:
@@ -7,7 +7,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arversion: ['6_1_0', '6_1_1', '6_1_2', '6_1_3', '6_1_4', '6_1_5', '6_1_6', '6_1_7']
+        arversion: ['7_0_6', '7_0_7', '7_0_8',
+                    '7_1_2', '7_1_3', '7_1_4']
     runs-on: ubuntu-22.04
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails${{ matrix.arversion }}.gemfile

@@ -12,7 +12,7 @@ require "activerecord-turntable"
 require "active_record/turntable/active_record_ext/fixtures"
 
 ActiveSupport.on_load(:active_record) do
-  if ENV["DATABASE_ADAPTER"] == "trilogy"
+  if ENV["DATABASE_ADAPTER"] == "trilogy" && !ActiveRecord::Turntable::Util.ar71_or_later?
     require "trilogy_adapter/connection"
     ActiveRecord::Base.public_send :extend, TrilogyAdapter::Connection
   end
@@ -44,6 +44,7 @@ MIGRATIONS_ROOT = File.expand_path(File.join(File.dirname(__FILE__), "migrations
 # in ./support/ and its subdirectories.
 database_yaml = File.read(File.join(File.dirname(__FILE__), "config/database.yml"))
 database_yaml = ERB.new(database_yaml).result
+ActiveRecord.legacy_connection_handling = false unless ActiveRecord::Turntable::Util.ar71_or_later?
 ActiveRecord::Base.configurations = YAML.safe_load(database_yaml, permitted_classes: [Symbol], aliases: true)
 ActiveRecord::Base.establish_connection(:test)
 

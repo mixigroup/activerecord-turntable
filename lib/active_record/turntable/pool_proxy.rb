@@ -60,6 +60,10 @@ module ActiveRecord::Turntable
       # Nothing to do
     end
 
+    def connection_class
+      @proxy.klass
+    end
+
     private
 
       def connection_pools_list

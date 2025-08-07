@@ -28,7 +28,7 @@ describe ActiveRecord::Turntable::Base do
       ActiveRecord::Base.force_connect_all_shards!
     end
 
-    subject { ActiveRecord::Base.clear_all_connections! }
+    subject { ActiveRecord::Base.connection_handler.clear_all_connections! }
 
     it "closes all connections" do
       expect { subject }.to change {
@@ -45,7 +45,7 @@ describe ActiveRecord::Turntable::Base do
 
       before do
         # release all connection on parent process
-        ActiveRecord::Base.clear_all_connections!
+        ActiveRecord::Base.connection_handler.clear_all_connections!
       end
 
       it "closes all connections" do
@@ -53,7 +53,7 @@ describe ActiveRecord::Turntable::Base do
 
         pid = fork {
           User.user_cluster_transaction {}
-          ActiveRecord::Base.clear_all_connections!
+          ActiveRecord::Base.connection_handler.clear_all_connections!
           connected_count = ObjectSpace.each_object(ActiveRecord::ConnectionAdapters::ConnectionPool).count { |pool| pool.connections && pool.connected? }
 
           wr.write connected_count

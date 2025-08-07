@@ -39,7 +39,7 @@ module ActiveRecord::Turntable
 
       def last_insert_id(conn)
         res = conn.execute("SELECT LAST_INSERT_ID()")
-        if conn.adapter_name == "Trilogy"
+        if conn.adapter_name == "Trilogy" && !Util.ar71_or_later?
           res.first.first.last.to_i
         else
           res.first.first.to_i

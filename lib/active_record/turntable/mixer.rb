@@ -18,12 +18,12 @@ module ActiveRecord::Turntable
       @proxy = proxy
     end
 
-    def build_fader(method_name, query, *args, &block)
+    def build_fader(method_name, query, *args, **kwargs, &block)
       method = method_name.to_s
       if @proxy.shard_fixed?
         return SpecifiedShard.new(@proxy,
                                   { @proxy.fixed_shard => query },
-                                  method, query, *args, &block)
+                                  method, query, *args, **kwargs, &block)
       end
       binds = (method == "insert") ? args[4] : args[1]
       binded_query = bind_sql(query, binds)
@@ -45,19 +45,19 @@ module ActiveRecord::Turntable
           # send to default shard
           return Fader::SpecifiedShard.new(@proxy,
                                            { @proxy.default_shard => query },
-                                           method, query, *args, &block)
+                                           method, query, *args, **kwargs, &block)
         end
 
-        build_select_fader(tree, method, query, *args, &block)
+        build_select_fader(tree, method, query, *args, **kwargs, &block)
       when SQLTree::Node::UpdateQuery, SQLTree::Node::DeleteQuery
-        build_update_fader(tree, method, query, *args, &block)
+        build_update_fader(tree, method, query, *args, **kwargs, &block)
       when SQLTree::Node::InsertQuery
-        build_insert_fader(tree, method, query, *args, &block)
+        build_insert_fader(tree, method, query, *args, **kwargs, &block)
       else
         # send to default shard
         Fader::SpecifiedShard.new(@proxy,
                                   { @proxy.default_shard => query },
-                                  method, query, *args, &block)
+                                  method, query, *args, **kwargs, &block)
       end
     rescue Exception => err
       logger.warn { "[ActiveRecord::Turntable] Error on Building Fader: #{binded_query}, on_method: #{method_name}, err: #{err}" }
@@ -136,7 +136,7 @@ module ActiveRecord::Turntable
         end
       end
 
-      def build_select_fader(tree, method, query, *args, &block)
+      def build_select_fader(tree, method, query, *args, **kwargs, &block)
         shard_keys = if !tree.where && tree.from.size == 1 && SQLTree::Node::SubQuery === tree.from.first.table_reference.table
                        find_shard_keys(tree.from.first.table_reference.table.where,
                                        @proxy.klass.table_name,
@@ -151,12 +151,12 @@ module ActiveRecord::Turntable
         if shard_keys.size == 1 # shard
           return Fader::SpecifiedShard.new(@proxy,
                                            { @proxy.cluster.shard_for(shard_keys.first) => query },
-                                           method, query, *args, &block)
+                                           method, query, *args, **kwargs, &block)
         elsif SQLTree::Node::SelectDeclaration === tree.select.first &&
               tree.select.first.to_sql == '1 AS "one"' # for `SELECT 1 AS one` (AR::Base.exists?)
           return Fader::SelectShardsMergeResult.new(@proxy,
                                                     build_shards_with_same_query(@proxy.shards, query),
-                                                    method, query, *args, &block)
+                                                    method, query, *args, **kwargs, &block)
         elsif @proxy.current_shard.blank? and (tree.group_by or tree.order_by or tree.limit.try(:value).to_i > 0)
           raise CannotSpecifyShardError, "cannot specify shard for query: #{tree.to_sql}"
         elsif shard_keys.present?
@@ -164,11 +164,11 @@ module ActiveRecord::Turntable
              SQLTree::Node::CountAggregrate === tree.select.first.expression
             return Fader::CalculateShardsSumResult.new(@proxy,
                                                        build_shards_with_same_query(@proxy.shards, query),
-                                                       method, query, *args, &block)
+                                                       method, query, *args, **kwargs, &block)
           else
             return Fader::SelectShardsMergeResult.new(@proxy,
                                                       Hash[shard_keys.map { |k| [@proxy.cluster.shard_for(k), query] }],
-                                                      method, query, *args, &block)
+                                                      method, query, *args, **kwargs, &block)
           end
         else # scan all shards
           if SQLTree::Node::SelectDeclaration === tree.select.first &&
@@ -179,7 +179,7 @@ module ActiveRecord::Turntable
             end
             return Fader::CalculateShardsSumResult.new(@proxy,
                                                        build_shards_with_same_query(@proxy.shards, query),
-                                                       method, query, *args, &block)
+                                                       method, query, *args, **kwargs, &block)
           elsif SQLTree::Node::AllFieldsDeclaration === tree.select.first ||
                 SQLTree::Node::Expression::Value === tree.select.first.expression ||
                 SQLTree::Node::Expression::Variable === tree.select.first.expression
@@ -189,14 +189,14 @@ module ActiveRecord::Turntable
             end
             return Fader::SelectShardsMergeResult.new(@proxy,
                                                       build_shards_with_same_query(@proxy.shards, query),
-                                                      method, query, *args, &block)
+                                                      method, query, *args, **kwargs, &block)
           else
             raise CannotSpecifyShardError, "cannot specify shard for query: #{tree.to_sql}"
           end
         end
       end
 
-      def build_update_fader(tree, method, query, *args, &block)
+      def build_update_fader(tree, method, query, *args, **kwargs, &block)
         shard_keys = find_shard_keys(tree.where, @proxy.klass.table_name, @proxy.klass.turntable_shard_key.to_s)
         shards_with_query = if shard_keys.present?
                               build_shards_with_same_query(shard_keys.map { |k| @proxy.cluster.shard_for(k) }, query)
@@ -207,18 +207,18 @@ module ActiveRecord::Turntable
         if shards_with_query.size == 1
           Fader::SpecifiedShard.new(@proxy,
                                     shards_with_query,
-                                    method, query, *args, &block)
+                                    method, query, *args, **kwargs, &block)
         else
           if raise_on_not_specified_shard_update?
             raise CannotSpecifyShardError, "[Performance Notice] PLEASE FIX: #{tree.to_sql}"
           end
           Fader::UpdateShardsMergeResult.new(@proxy,
                                              shards_with_query,
-                                             method, query, *args, &block)
+                                             method, query, *args, **kwargs, &block)
         end
       end
 
-      def build_insert_fader(tree, method, query, *args, &block)
+      def build_insert_fader(tree, method, query, *args, **kwargs, &block)
         values_hash = divide_insert_values(tree, @proxy.klass.turntable_shard_key)
         shards_with_query = {}
         values_hash.each do |k, vs|
@@ -230,7 +230,7 @@ module ActiveRecord::Turntable
           sql.gsub!('("\0")') { value_sql }
           shards_with_query[@proxy.cluster.shard_for(k)] = sql
         end
-        Fader::InsertShardsMergeResult.new(@proxy, shards_with_query, method, query, *args, &block)
+        Fader::InsertShardsMergeResult.new(@proxy, shards_with_query, method, query, *args, **kwargs, &block)
       end
 
       def raise_on_not_specified_shard_query?

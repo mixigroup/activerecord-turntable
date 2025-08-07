@@ -5,21 +5,7 @@ describe ActiveRecord::Turntable::ActiveRecordExt::QueryCache do
   def middleware(&app)
     executor = Class.new(ActiveSupport::Executor)
     ActiveRecord::QueryCache.install_executor_hooks executor
-    lambda do |env|
-      begin
-        if ActiveRecord::Turntable::Util.ar60_or_later?
-          original_handlers = ActiveRecord::Base.connection_handlers
-          ActiveRecord::Base.connection_handlers = { writing: ActiveRecord::Base.default_connection_handler, reading: ActiveRecord::ConnectionAdapters::ConnectionHandler.new }
-        end
-        executor.wrap do
-          app.call(env)
-        end
-      ensure
-        if ActiveRecord::Turntable::Util.ar60_or_later?
-          ActiveRecord::Base.connection_handlers = original_handlers
-        end
-      end
-    end
+    lambda { |env| executor.wrap { app.call(env) } }
   end
 
   def disable_query_cache
